@@ -1,5 +1,9 @@
 import express, { Request, Response } from 'express'
 
+import dotenv from 'dotenv'
+
+dotenv.config()
+
 const app = express()
 
 function main() {
@@ -10,8 +14,8 @@ function main() {
       message: 'success',
     })
   })
-
-  app.listen(3000, () => {
+  console.log(process.env.PORT)
+  app.listen(process.env.PORT || 3000, () => {
     console.log('Server is running on port 3000')
   })
 }
