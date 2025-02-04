@@ -16,6 +16,13 @@ class UserService {
             throw console.log(error)
         }
     }
+    async findAllUsers(): Promise<User[] | null> {
+        try {
+            return await this.prisma.user.findMany()
+        } catch (error) {
+            throw console.log(error)
+        }
+    }
     async createUser(data: {
         firstname: string
         mail: string

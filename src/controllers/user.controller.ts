@@ -24,6 +24,14 @@ class UserController {
             }
         }
     }
+    async getAllUsers(req: Request, res: Response): Promise<void> {
+        try {
+            const users = await this.userService.findAllUsers()
+            res.json(users)
+        } catch (error) {
+            res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
+        }
+    }
     async createUser(req: Request, res: Response): Promise<void> {
         try {
             const { firstname, mail, password, birthday_date } = req.body
