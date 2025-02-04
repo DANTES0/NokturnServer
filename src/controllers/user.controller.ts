@@ -1,0 +1,47 @@
+import UserService from '@/services/user.service'
+import { Request, Response } from 'express'
+
+class UserController {
+    private userService: UserService
+
+    constructor() {
+        this.userService = new UserService()
+    }
+
+    async getUser(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.params.id
+            const user = await this.userService.findUserById(userId)
+
+            if (!user) {
+                res.status(404).json({ message: 'Пользователь не найден' })
+                return
+            }
+            res.json(user)
+        } catch (error) {
+            {
+                res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
+            }
+        }
+    }
+    async createUser(req: Request, res: Response): Promise<void> {
+        try {
+            const { firstname, mail, password, birthday_date } = req.body
+            if (!firstname || !mail || !password || !birthday_date) {
+                res.status(400).json({ message: 'Имя, почта, пароль и дата рождения обязательны' })
+                return
+            }
+            const user = await this.userService.createUser({
+                firstname,
+                mail,
+                password,
+                birthday_date,
+            })
+            res.status(201).json(user)
+        } catch (error) {
+            res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
+        }
+    }
+}
+
+export default new UserController()
