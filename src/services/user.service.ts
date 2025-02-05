@@ -23,12 +23,7 @@ class UserService {
             throw console.log(error)
         }
     }
-    async createUser(data: {
-        firstname: string
-        mail: string
-        password: string
-        birthday_date: string
-    }): Promise<User> {
+    async createUser(data: { firstname: string; mail: string; password: string; birthday_date: string }): Promise<User> {
         try {
             return await this.prisma.user.create({
                 data: {

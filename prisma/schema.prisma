@@ -27,4 +27,5 @@ model User {
   special_info        String?
   name_visible        Boolean @default(true)
   rating              Float   @default(0.0)
+  created_at          DateTime @default(now())
 }

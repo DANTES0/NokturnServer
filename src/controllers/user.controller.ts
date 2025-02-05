@@ -1,18 +1,44 @@
 import UserService from '@/services/user.service'
 import { Request, Response } from 'express'
 
+interface JwtPayload {
+    id: string
+    mail: string
+}
+
+interface CustomRequest extends Request {
+    user?: JwtPayload
+}
+
 class UserController {
     private userService: UserService
 
     constructor() {
         this.userService = new UserService()
     }
+    async getCurrentUser(req: CustomRequest, res: Response): Promise<void> {
+        try {
+            console.log('Запрос на получение пользователя')
+            const userId = req.user?.id
+            if (!userId) {
+                res.status(401).json({ message: 'Пользователь не авторизован' })
+                return
+            }
+            const user = await this.userService.findUserById(userId)
+            if (!user) {
+                res.status(404).json({ message: 'Пользователь не найден' })
+                return
+            }
+            res.json(user)
+        } catch (error) {
+            res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
+        }
+    }
 
     async getUser(req: Request, res: Response): Promise<void> {
         try {
             const userId = req.params.id
             const user = await this.userService.findUserById(userId)
-
             if (!user) {
                 res.status(404).json({ message: 'Пользователь не найден' })
                 return
