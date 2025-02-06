@@ -7,6 +7,22 @@ class UserService {
         this.prisma = new PrismaClient()
     }
 
+    // async updateUser(id: string, firstname: string, lastname: string, mail:string, birthday_date: string, vk_link: string, tg_link: string, description: string, special_info: string)
+
+    async updateUser(id: string, userData: Partial<User>) {
+        try {
+            if (!userData) {
+                throw new Error('Не указаны данные для оьбновленя')
+            }
+            return await this.prisma.user.update({
+                where: { id },
+                data: userData,
+            })
+        } catch (error) {
+            throw new Error('Не удалось обновить данные пользователя')
+        }
+    }
+
     async findUserById(id: string): Promise<User | null> {
         try {
             return await this.prisma.user.findUnique({

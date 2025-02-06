@@ -76,6 +76,19 @@ class UserController {
             res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
         }
     }
+
+    async UpdateUser(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params
+            const userData = req.body
+
+            const updateUser = await this.userService.updateUser(id, userData)
+
+            res.status(200).json(updateUser)
+        } catch (error) {
+            res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
+        }
+    }
 }
 
 export default new UserController()
