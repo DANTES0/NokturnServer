@@ -9,10 +9,20 @@ class UserService {
 
     // async updateUser(id: string, firstname: string, lastname: string, mail:string, birthday_date: string, vk_link: string, tg_link: string, description: string, special_info: string)
 
-    async updateUser(id: string, userData: Partial<User>) {
+    async updateUser(
+        id: string,
+        userData: Partial<User>,
+        files?: { profile_photo?: Express.Multer.File; profile_header_photo?: Express.Multer.File },
+    ) {
         try {
             if (!userData) {
                 throw new Error('Не указаны данные для оьбновленя')
+            }
+            if (files?.profile_header_photo) {
+                userData.profile_header_photo = `/uploads/${files.profile_header_photo.filename}`
+            }
+            if (files?.profile_photo) {
+                userData.profile_photo = `/uploads/${files.profile_photo.filename}`
             }
             return await this.prisma.user.update({
                 where: { id },

@@ -18,7 +18,6 @@ class UserController {
     }
     async getCurrentUser(req: CustomRequest, res: Response): Promise<void> {
         try {
-            console.log('Запрос на получение пользователя')
             const userId = req.user?.id
             if (!userId) {
                 res.status(401).json({ message: 'Пользователь не авторизован' })
@@ -82,7 +81,14 @@ class UserController {
             const { id } = req.params
             const userData = req.body
 
-            const updateUser = await this.userService.updateUser(id, userData)
+            const files = req.files as { [fieldname: string]: Express.Multer.File[] }
+            const profile_photo = files?.profile_photo ? files.profile_photo[0] : undefined
+            const profile_header_photo = files?.profile_header_photo ? files.profile_header_photo[0] : undefined
+
+            const updateUser = await this.userService.updateUser(id, userData, {
+                profile_photo,
+                profile_header_photo,
+            })
 
             res.status(200).json(updateUser)
         } catch (error) {

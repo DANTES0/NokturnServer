@@ -26,7 +26,6 @@ class AuthMiddleware {
         try {
             const decoded = jwt.verify(token, secretKey) as JwtPayload
             req.user = decoded
-            console.log(req.user)
             next()
         } catch (error) {
             res.status(401).json({ message: 'Неверный токен' })
