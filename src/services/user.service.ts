@@ -29,7 +29,8 @@ class UserService {
                 data: userData,
             })
         } catch (error) {
-            throw new Error('Не удалось обновить данные пользователя')
+            console.log('ОШибка при добавлении пользователя:', error)
+            throw new Error(`Не удалось обновить данные пользователя: ${error}`)
         }
     }
 

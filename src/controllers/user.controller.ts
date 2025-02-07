@@ -85,6 +85,9 @@ class UserController {
             const profile_photo = files?.profile_photo ? files.profile_photo[0] : undefined
             const profile_header_photo = files?.profile_header_photo ? files.profile_header_photo[0] : undefined
 
+            if (typeof userData.name_visible === 'string') {
+                userData.name_visible = userData.name_visible === 'true'
+            }
             const updateUser = await this.userService.updateUser(id, userData, {
                 profile_photo,
                 profile_header_photo,
