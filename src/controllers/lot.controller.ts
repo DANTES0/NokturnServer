@@ -33,7 +33,18 @@ class LotController {
                 res.status(404).json({ message: 'Лот не найден' })
                 return
             }
-            res.json(lot)
+            res.status(200).json(lot)
+        } catch (error) {
+            res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
+        }
+    }
+    async getLotsByCategories(req: Request, res: Response): Promise<void> {
+        try {
+            const { category } = req.query
+            const lots = await this.lotService.findLotsByCategory({
+                category: category as string | undefined,
+            })
+            res.status(200).json(lots)
         } catch (error) {
             res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
         }

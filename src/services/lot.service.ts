@@ -55,6 +55,16 @@ class LotService {
             throw console.log(error)
         }
     }
+
+    async findLotsByCategory(filters: { category?: string }): Promise<Lot[] | null> {
+        try {
+            return await this.prisma.lot.findMany({
+                where: { category: filters.category },
+            })
+        } catch (error) {
+            throw console.log(error)
+        }
+    }
 }
 
 export default LotService
