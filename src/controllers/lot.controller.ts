@@ -24,5 +24,19 @@ class LotController {
             res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
         }
     }
+
+    async getLotById(req: Request, res: Response): Promise<void> {
+        try {
+            const lotId = req.params.id
+            const lot = await this.lotService.findLotById(Number(lotId))
+            if (!lot) {
+                res.status(404).json({ message: 'Лот не найден' })
+                return
+            }
+            res.json(lot)
+        } catch (error) {
+            res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
+        }
+    }
 }
 export default new LotController()

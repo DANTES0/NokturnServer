@@ -46,6 +46,15 @@ class LotService {
     }
 
     async findAllPosts() {}
+    async findLotById(id: number): Promise<Lot | null> {
+        try {
+            return await this.prisma.lot.findUnique({
+                where: { id },
+            })
+        } catch (error) {
+            throw console.log(error)
+        }
+    }
 }
 
 export default LotService

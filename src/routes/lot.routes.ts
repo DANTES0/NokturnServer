@@ -5,5 +5,5 @@ import { Router } from 'express'
 const router = Router()
 
 router.post('/', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'another_images' }]), lotController.createLot.bind(lotController))
-
+router.get('/:id', lotController.getLotById.bind(lotController))
 export default router
