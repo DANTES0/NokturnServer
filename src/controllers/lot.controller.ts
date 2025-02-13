@@ -40,9 +40,10 @@ class LotController {
     }
     async getLotsByCategories(req: Request, res: Response): Promise<void> {
         try {
-            const { category } = req.query
+            const { category, userId } = req.query
             const lots = await this.lotService.findLotsByCategory({
                 category: category as string | undefined,
+                userId: userId as string | undefined,
             })
             res.status(200).json(lots)
         } catch (error) {

@@ -55,11 +55,11 @@ class LotService {
             throw console.log(error)
         }
     }
-
-    async findLotsByCategory(filters: { category?: string }): Promise<Lot[] | null> {
+    //ЗАПРОС ДЛЯ ФИЛЬТРОВ
+    async findLotsByCategory(filters: { category?: string; userId?: string }): Promise<Lot[] | null> {
         try {
             return await this.prisma.lot.findMany({
-                where: { category: filters.category },
+                where: { category: filters.category, userId: filters.userId },
             })
         } catch (error) {
             throw console.log(error)
