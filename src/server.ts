@@ -5,6 +5,13 @@ import authRoutes from './routes/auth.routes'
 import lotRoutes from './routes/lot.routes'
 import cors from 'cors'
 import path from 'path'
+import LotService from './services/lot.service'
+
+const lotService = new LotService()
+
+setInterval(async () => {
+    await lotService.activateLots()
+}, 60 * 1000)
 
 dotenv.config()
 

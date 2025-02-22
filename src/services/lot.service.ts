@@ -46,6 +46,7 @@ class LotService {
     }
 
     async findAllPosts() {}
+    async findNewPosts() {}
     async findLotById(id: number): Promise<Lot | null> {
         try {
             return await this.prisma.lot.findUnique({
@@ -56,13 +57,34 @@ class LotService {
         }
     }
     //ЗАПРОС ДЛЯ ФИЛЬТРОВ
-    async findLotsByCategory(filters: { category?: string; userId?: string }): Promise<Lot[] | null> {
+    async findLotsByCategory(filters: { category?: string; userId?: string; lot_status?: string }): Promise<Lot[] | null> {
         try {
             return await this.prisma.lot.findMany({
-                where: { category: filters.category, userId: filters.userId },
+                where: { category: filters.category, userId: filters.userId, lot_status: filters.lot_status },
             })
         } catch (error) {
             throw console.log(error)
+        }
+    }
+
+    async activateLots(): Promise<void | null> {
+        try {
+            const now = new Date()
+
+            const updatedLots = await this.prisma.lot.updateMany({
+                where: {
+                    lot_status: 'inactive',
+                    begin_time_date: {
+                        lte: now,
+                    },
+                },
+                data: {
+                    lot_status: 'active',
+                },
+            })
+            console.log(`Обновлено лотов: ${updatedLots.count}`)
+        } catch (error) {
+            console.error('Ошибка при обновлении статуса лотов', error)
         }
     }
 }
