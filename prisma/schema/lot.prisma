@@ -1,21 +1,23 @@
 model Lot {
-  id              Int        @id @default(autoincrement())
-  userId          String
-  image           String     
-  name            String     
-  category        String     
-  size            String     
-  starting_bet     Float     
-  current_bet      Float
+  id                Int      @id @default(autoincrement())
+  userId            String
+  image             String
+  name              String
+  category          String
+  size              String
+  starting_bet      Float
+  current_bet       Float
   min_bid_increment Float
-  reserve_price Float?
-  description      String
-  lot_status       String    @default("active")
-  begin_time_date   DateTime   
+  reserve_price     Float?
+  description       String
+  lot_status        String   @default("active")
+  begin_time_date   DateTime
   end_time_date     DateTime
-  buyer_id String?
-  another_images            String[] 
-  updated_at       DateTime   @updatedAt
+  buyer_id          String?
+  another_images    String[]
+  updated_at        DateTime @updatedAt
 
-  user            User       @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  histories HistoryLotBet[]
 }

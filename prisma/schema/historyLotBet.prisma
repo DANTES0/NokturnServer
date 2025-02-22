@@ -1,0 +1,10 @@
+model HistoryLotBet {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  lotId     Int
+  time_date DateTime @default(now())
+  bet       Float
+
+  user User @relation(fields: [userId], references: [id])
+  lot  Lot  @relation(fields: [lotId], references: [id])
+}

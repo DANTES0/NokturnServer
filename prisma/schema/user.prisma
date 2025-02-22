@@ -1,19 +1,20 @@
 model User {
-  id               String  @id @default(cuid())
-  firstname           String
-  lastname            String?
-  mail                String  @unique
-  password            String
-  birthday_date       DateTime
-  vk_link             String?
-  tg_link             String?
-  description         String?
-  profile_photo       String?
+  id                   String   @id @default(cuid())
+  firstname            String
+  lastname             String?
+  mail                 String   @unique
+  password             String
+  birthday_date        DateTime
+  vk_link              String?
+  tg_link              String?
+  description          String?
+  profile_photo        String?
   profile_header_photo String?
-  special_info        String?
-  name_visible        Boolean @default(true)
-  rating              Float   @default(0.0)
-  created_at          DateTime @default(now())
+  special_info         String?
+  name_visible         Boolean  @default(true)
+  rating               Float    @default(0.0)
+  created_at           DateTime @default(now())
 
-  lots                 Lot[] 
+  lots      Lot[]
+  histories HistoryLotBet[]
 }
