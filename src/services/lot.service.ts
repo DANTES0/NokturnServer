@@ -1,3 +1,4 @@
+import { io } from '@/server'
 import { PrismaClient, Lot } from '@prisma/client'
 
 class LotService {
@@ -86,6 +87,35 @@ class LotService {
         } catch (error) {
             console.error('Ошибка при обновлении статуса лотов', error)
         }
+    }
+
+    //Сервис для ставок
+    async palceBet(userId: string, lotId: string, bet: number) {
+        const lot = await this.prisma.lot.findUnique({ where: { id: Number(lotId) } })
+
+        if (!lot) {
+            throw new Error('Лот не найден')
+        }
+
+        if (bet <= lot.current_bet) {
+            throw new Error('Ставка должна быть выше текущей')
+        }
+
+        await this.prisma.historyLotBet.create({
+            data: {
+                userId: userId,
+                lotId: Number(lotId),
+                bet: bet,
+                time_date: new Date(),
+            },
+        })
+        const updatedLot = await this.prisma.lot.update({
+            where: { id: Number(lotId) },
+            data: { current_bet: bet },
+        })
+        io.emit('newBet', { lotId, bet, userId })
+
+        return updatedLot
     }
 }
 

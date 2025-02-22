@@ -51,5 +51,21 @@ class LotController {
             res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
         }
     }
+
+    async placeUpdatedLotBet(req: Request, res: Response): Promise<void> {
+        try {
+            const { lotId, bet, userId } = req.body
+
+            if (!userId || !lotId || !bet) {
+                res.status(400).json({ message: 'Все поля обязательны' })
+            }
+
+            const placeUpdateLot = await this.lotService.palceBet(userId, lotId, Number(bet))
+
+            res.status(200).json(placeUpdateLot)
+        } catch (error) {
+            res.status(500).json({ message: 'Ошибка при размещении ставки', error: (error as Error).message })
+        }
+    }
 }
 export default new LotController()
