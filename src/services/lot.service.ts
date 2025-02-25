@@ -1,5 +1,5 @@
 import { io } from '@/server'
-import { PrismaClient, Lot } from '@prisma/client'
+import { PrismaClient, Lot, HistoryLotBet } from '@prisma/client'
 
 class LotService {
     private prisma: PrismaClient
@@ -116,6 +116,16 @@ class LotService {
         io.emit('newBet', { lotId, bet, userId })
 
         return updatedLot
+    }
+
+    async getHistoryLotBet(lotId: number): Promise<HistoryLotBet[] | null> {
+        try {
+            return await this.prisma.historyLotBet.findMany({
+                where: { lotId: lotId },
+            })
+        } catch (error) {
+            throw console.log(error)
+        }
     }
 }
 

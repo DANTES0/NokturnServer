@@ -67,5 +67,20 @@ class LotController {
             res.status(500).json({ message: 'Ошибка при размещении ставки', error: (error as Error).message })
         }
     }
+
+    async getHistoryLot(req: Request, res: Response): Promise<void> {
+        try {
+            const { lotId } = req.params
+
+            if (!lotId) {
+                res.status(400).json({ message: 'Нет айди лота' })
+            }
+
+            const getHistoryLot = await this.lotService.getHistoryLotBet(Number(lotId))
+            res.status(200).json(getHistoryLot)
+        } catch (error) {
+            res.status(500).json({ message: 'Ошибка при просмотре истории ставок', error: (error as Error).message })
+        }
+    }
 }
 export default new LotController()
