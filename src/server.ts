@@ -32,6 +32,9 @@ io.on('connection', (socket) => {
         console.log('Ставка получена', data)
 
         io.emit('newBet', data)
+        const updatedHistory = await lotService.getHistoryLotBet(data.lotId)
+        console.log('Отправляем обновлённую историю:', updatedHistory)
+        io.emit('updateHistory', updatedHistory)
     })
 
     socket.on('leaveLot', (userId) => {

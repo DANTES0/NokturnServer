@@ -120,9 +120,11 @@ class LotService {
 
     async getHistoryLotBet(lotId: number): Promise<HistoryLotBet[] | null> {
         try {
-            return await this.prisma.historyLotBet.findMany({
+            const getLot = await this.prisma.historyLotBet.findMany({
                 where: { lotId: lotId },
+                orderBy: { time_date: 'desc' },
             })
+            return getLot
         } catch (error) {
             throw console.log(error)
         }
