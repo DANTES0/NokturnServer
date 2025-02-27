@@ -89,6 +89,38 @@ class LotService {
         }
     }
 
+    async completedLots(): Promise<void | null> {
+        try {
+            const now = new Date()
+
+            const expiredLots = await this.prisma.lot.findMany({
+                where: {
+                    end_time_date: { lte: now },
+                    lot_status: 'active',
+                },
+            })
+            if (expiredLots.length === 0) return
+            for (const lot of expiredLots) {
+                const lastBet = await this.prisma.historyLotBet.findFirst({
+                    where: { lotId: lot.id },
+                    orderBy: { time_date: 'desc' },
+                    select: { userId: true },
+                })
+
+                await this.prisma.lot.update({
+                    where: { id: lot.id },
+                    data: {
+                        lot_status: 'completed',
+                        buyer_id: lastBet ? lastBet.userId : null,
+                    },
+                })
+                console.log(`Лот ${lot.id} завершён. Покупатель: ${lastBet?.userId || 'нет ставок'}`)
+            }
+        } catch (error) {
+            console.error('Ошибка при обновлении статуса лотов', error)
+        }
+    }
+
     //Сервис для ставок
     async palceBet(userId: string, lotId: string, bet: number) {
         const lot = await this.prisma.lot.findUnique({ where: { id: Number(lotId) } })

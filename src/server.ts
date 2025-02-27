@@ -23,9 +23,11 @@ const lotService = new LotService()
 
 setInterval(async () => {
     await lotService.activateLots()
+    await lotService.completedLots()
 }, 60 * 1000)
 
 io.on('connection', (socket) => {
+    // io.disconnectSockets()
     console.log('Пользователь подключился', socket.id)
 
     socket.on('placeBet', async (data) => {
@@ -46,7 +48,7 @@ io.on('connection', (socket) => {
         console.log('Пользователь отключился', socket.id)
     })
 })
-io.disconnectSockets()
+
 function main() {
     app.use(cors())
     app.use(express.json())
