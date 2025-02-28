@@ -40,11 +40,16 @@ class LotController {
     }
     async getLotsByCategories(req: Request, res: Response): Promise<void> {
         try {
-            const { category, userId, lot_status } = req.query
+            const { category, userId, lot_status, name, minStartPrice, maxStartPrice, minCurrentPrice, maxCurrentPrice } = req.query
             const lots = await this.lotService.findLotsByCategory({
                 category: category as string | undefined,
                 userId: userId as string | undefined,
                 lot_status: lot_status as string | undefined,
+                name: name as string | undefined,
+                minStartPrice: minStartPrice as number | undefined,
+                maxStartPrice: maxStartPrice as number | undefined,
+                minCurrentPrice: minCurrentPrice as number | undefined,
+                maxCurrentPrice: maxCurrentPrice as number | undefined,
             })
             res.status(200).json(lots)
         } catch (error) {

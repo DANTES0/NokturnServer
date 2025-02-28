@@ -58,10 +58,38 @@ class LotService {
         }
     }
     //ЗАПРОС ДЛЯ ФИЛЬТРОВ
-    async findLotsByCategory(filters: { category?: string; userId?: string; lot_status?: string }): Promise<Lot[] | null> {
+    async findLotsByCategory(filters: {
+        category?: string
+        userId?: string
+        lot_status?: string
+        name?: string
+        minStartPrice?: number
+        maxStartPrice?: number
+        minCurrentPrice?: number
+        maxCurrentPrice?: number
+    }): Promise<Lot[] | null> {
         try {
             return await this.prisma.lot.findMany({
-                where: { category: filters.category, userId: filters.userId, lot_status: filters.lot_status },
+                where: {
+                    category: filters.category,
+                    userId: filters.userId,
+                    lot_status: filters.lot_status,
+                    name: filters.name ? { contains: filters.name, mode: 'insensitive' } : undefined,
+                    starting_bet:
+                        filters.minStartPrice || filters.maxStartPrice
+                            ? {
+                                  ...(filters.minStartPrice !== undefined ? { gte: Number(filters.minStartPrice) } : {}),
+                                  ...(filters.maxStartPrice !== undefined ? { lte: Number(filters.maxStartPrice) } : {}),
+                              }
+                            : undefined,
+                    current_bet:
+                        filters.minCurrentPrice || filters.maxCurrentPrice
+                            ? {
+                                  ...(filters.minCurrentPrice !== undefined ? { gte: Number(filters.minCurrentPrice) } : {}),
+                                  ...(filters.maxCurrentPrice !== undefined ? { lte: Number(filters.maxCurrentPrice) } : {}),
+                              }
+                            : undefined,
+                },
             })
         } catch (error) {
             throw console.log(error)
