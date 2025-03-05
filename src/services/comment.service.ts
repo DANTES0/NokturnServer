@@ -13,9 +13,15 @@ class CommentService {
                 where: { lotId },
                 include: {
                     user: {
-                        select: { id: true, firstname: true, lastname: true },
+                        select: { id: true, firstname: true, lastname: true, profile_photo: true },
                     },
-                    replies: true,
+                    replies: {
+                        include: {
+                            user: {
+                                select: { id: true, firstname: true, lastname: true, profile_photo: true },
+                            },
+                        },
+                    },
                 },
             })
         } catch (error) {
