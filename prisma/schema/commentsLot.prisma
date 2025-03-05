@@ -1,0 +1,18 @@
+model CommentsLot {
+  id              Int      @id @default(autoincrement()) 
+  userId         String      
+  lotId          Int      
+  commentsText   String   
+  parentId       Int?     
+  timeDateCreated DateTime @default(now()) 
+  isDeleted      Boolean  @default(false)  
+
+ 
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lot    Lot    @relation(fields: [lotId], references: [id], onDelete: Cascade)
+  parent CommentsLot? @relation("ParentComment", fields: [parentId], references: [id])
+  replies CommentsLot[] @relation("ParentComment")
+
+  @@index([lotId]) 
+  @@index([parentId]) 
+}

@@ -17,4 +17,5 @@ model User {
 
   lots      Lot[]
   histories HistoryLotBet[]
+  comments CommentsLot[]
 }

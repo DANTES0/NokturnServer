@@ -20,4 +20,5 @@ model Lot {
   user User @relation(fields: [userId], references: [id])
 
   histories HistoryLotBet[]
+  comments CommentsLot[]
 }
