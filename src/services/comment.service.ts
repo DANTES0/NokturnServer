@@ -11,6 +11,7 @@ class CommentService {
         try {
             return await this.prisma.commentsLot.findMany({
                 where: { lotId },
+                orderBy: { timeDateCreated: 'desc' },
                 include: {
                     user: {
                         select: { id: true, firstname: true, lastname: true, profile_photo: true },
