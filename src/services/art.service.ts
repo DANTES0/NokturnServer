@@ -40,5 +40,20 @@ class ArtService {
             throw new Error(`Не удалось получить арты: ${error}`)
         }
     }
+
+    async getArtAll(): Promise<Art[] | null> {
+        try {
+            return await this.prisma.art.findMany({
+                orderBy: { load_time: 'desc' },
+                include: {
+                    user: {
+                        select: { id: true, firstname: true, lastname: true, profile_photo: true },
+                    },
+                },
+            })
+        } catch (error) {
+            throw new Error(`Не удалось получить арты: ${error}`)
+        }
+    }
 }
 export default ArtService
