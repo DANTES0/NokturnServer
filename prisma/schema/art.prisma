@@ -1,0 +1,9 @@
+model Art {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  image             String
+  name String
+  load_time DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}

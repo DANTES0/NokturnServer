@@ -4,6 +4,7 @@ import userRoutes from './routes/user.routes'
 import authRoutes from './routes/auth.routes'
 import lotRoutes from './routes/lot.routes'
 import commentRoutes from './routes/comment.routes'
+import artRoutes from './routes/art.routes'
 import cors from 'cors'
 import path from 'path'
 import LotService from './services/lot.service'
@@ -59,6 +60,7 @@ function main() {
     app.use('/api/users', userRoutes)
     app.use('/api/lot', lotRoutes)
     app.use('/api/comment', commentRoutes)
+    app.use('/api/art', artRoutes)
     server.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`)
     })
