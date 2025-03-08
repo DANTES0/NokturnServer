@@ -45,7 +45,13 @@ class UserService {
     }
     async findAllUsers(): Promise<User[] | null> {
         try {
-            return await this.prisma.user.findMany()
+            return await this.prisma.user.findMany({
+                include: {
+                    arts: {
+                        select: { id: true, image: true, name: true },
+                    },
+                },
+            })
         } catch (error) {
             throw console.log(error)
         }
