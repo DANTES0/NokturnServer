@@ -15,8 +15,14 @@ model User {
   rating               Float    @default(0.0)
   created_at           DateTime @default(now())
 
+  chats1 Chat[] @relation("User1")
+  chats2 Chat[] @relation("User2")
+
   lots      Lot[]
   histories HistoryLotBet[]
   arts Art[]
   comments CommentsLot[]
+
+  
+  messages Message[]
 }

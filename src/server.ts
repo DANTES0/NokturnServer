@@ -5,11 +5,13 @@ import authRoutes from './routes/auth.routes'
 import lotRoutes from './routes/lot.routes'
 import commentRoutes from './routes/comment.routes'
 import artRoutes from './routes/art.routes'
+import chatRoutes from './routes/chat.routes'
 import cors from 'cors'
 import path from 'path'
 import LotService from './services/lot.service'
 import http from 'http'
 import { Server } from 'socket.io'
+import ChatService from './services/chat.service'
 
 dotenv.config()
 
@@ -22,6 +24,7 @@ const io = new Server(server, {
     cors: { origin: '*' },
 })
 const lotService = new LotService()
+const chatService = new ChatService()
 
 setInterval(async () => {
     await lotService.activateLots()
@@ -46,9 +49,33 @@ io.on('connection', (socket) => {
         socket.leave(`user_${userId}`)
     })
 
-    io.on('disconnect', () => {
+    //******* *
+    socket.on('sendMessage', async ({ chatId, senderId, text }) => {
+        console.log(`Новое сообщение в чате ${chatId} от ${senderId}: ${text}`)
+
+        const newMessage = await chatService.createMessage(chatId, senderId, text)
+
+        io.to(`chat_${chatId}`).emit('newMessage', newMessage)
+    })
+
+    socket.on('joinChat', (chatId) => {
+        socket.join(`chat_${chatId}`)
+        console.log(`Пользователь ${socket.id} присоединился к чату ${chatId}`)
+    })
+
+    socket.on('leaveChat', (chatId) => {
+        socket.leave(`chat_${chatId}`)
+        console.log(`Пользователь ${socket.id} покинул чат ${chatId}`)
+    })
+
+    socket.on('disconnect', () => {
         console.log('Пользователь отключился', socket.id)
     })
+    //************** */
+
+    // io.on('disconnect', () => {
+    //     console.log('Пользователь отключился', socket.id)
+    // })
 })
 
 function main() {
@@ -61,6 +88,7 @@ function main() {
     app.use('/api/lot', lotRoutes)
     app.use('/api/comment', commentRoutes)
     app.use('/api/art', artRoutes)
+    app.use('/api/chat', chatRoutes)
     server.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`)
     })

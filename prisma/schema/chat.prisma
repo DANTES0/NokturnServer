@@ -1,0 +1,9 @@
+model Chat {
+  id           String   @id @default(uuid()) 
+  user1Id      String   
+  user2Id      String   
+  messages     Message[]
+  user1     User     @relation("User1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User     @relation("User2", fields: [user2Id], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+}
