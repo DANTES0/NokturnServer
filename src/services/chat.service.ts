@@ -81,6 +81,16 @@ class ChatService {
         try {
             return await this.prisma.message.create({
                 data: { chatId, senderId, text },
+                include: {
+                    sender: {
+                        select: {
+                            id: true,
+                            firstname: true,
+                            lastname: true,
+                            profile_photo: true, // Теперь возвращаем фото
+                        },
+                    },
+                },
             })
         } catch (error) {
             throw console.log(error)
