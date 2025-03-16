@@ -79,9 +79,18 @@ io.on('connection', (socket) => {
     })
 
     socket.on('markAsRead', async ({ chatId, userId }) => {
-        console.log(`Пользователь ${userId} прочитал сообщения в чате ${chatId}`)
-        await chatService.markMessagesAsRead(chatId, userId)
-        io.to(`chat_${chatId}`).emit('updateUnreadCount', { chatId, count: 0 })
+        console.log(`✅ Пользователь ${userId} прочитал сообщения в чате ${chatId}`)
+
+        // Обновляем все непрочитанные сообщения как прочитанные
+        const updatedMessages = await chatService.markMessagesAsRead(chatId, userId)
+        console.log('ОАИШРПШАПШАП', updatedMessages)
+
+        // Сообщаем всем пользователям в чате, что сообщения теперь прочитаны
+        io.to(`chat_${chatId}`).emit('messagesRead', { chatId, updatedMessages })
+
+        // Обновляем счетчик непрочитанных сообщений у получателя
+        const unreadCount = await chatService.countUnreadMessages(chatId, userId)
+        io.to(`chat_${chatId}`).emit('updateUnreadCount', { chatId, count: unreadCount })
     })
 
     socket.on('joinChat', (chatId) => {

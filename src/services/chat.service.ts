@@ -134,6 +134,21 @@ class ChatService {
 
         return chat.user1.id === senderId ? chat.user2.id : chat.user1.id
     }
+
+    async getMessages(chatId: string) {
+        return await this.prisma.message.findMany({
+            where: { chatId },
+            orderBy: { createdAt: 'asc' },
+            select: {
+                id: true,
+                text: true,
+                senderId: true,
+                chatId: true,
+                createdAt: true,
+                isRead: true,
+            },
+        })
+    }
 }
 
 export default ChatService
