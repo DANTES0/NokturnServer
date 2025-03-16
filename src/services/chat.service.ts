@@ -65,11 +65,17 @@ class ChatService {
                     OR: [{ user1Id: userId }, { user2Id: userId }],
                 },
                 include: {
-                    user1: { select: { id: true, firstname: true, lastname: true, profile_photo: true } },
-                    user2: { select: { id: true, firstname: true, lastname: true, profile_photo: true } },
                     messages: {
-                        include: { sender: true },
+                        select: {
+                            id: true,
+                            text: true,
+                            createdAt: true,
+                            senderId: true,
+                            isRead: true,
+                        },
                     },
+                    user1: true,
+                    user2: true,
                 },
             })
         } catch (error) {
@@ -80,7 +86,7 @@ class ChatService {
     async createMessage(chatId: string, senderId: string, text: string): Promise<Message> {
         try {
             return await this.prisma.message.create({
-                data: { chatId, senderId, text },
+                data: { chatId, senderId, text, isRead: false },
                 include: {
                     sender: {
                         select: {
@@ -95,6 +101,38 @@ class ChatService {
         } catch (error) {
             throw console.log(error)
         }
+    }
+
+    async countUnreadMessages(chatId: string, senderId: string): Promise<number> {
+        try {
+            const count = await this.prisma.message.count({
+                where: { chatId, isRead: false, senderId: { not: senderId } },
+            })
+            return count
+        } catch (error) {
+            throw console.log(error)
+        }
+    }
+
+    async markMessagesAsRead(chatId: string, userId: string) {
+        try {
+            return await this.prisma.message.updateMany({
+                where: { chatId, senderId: { not: userId }, isRead: false },
+                data: { isRead: true },
+            })
+        } catch (error) {
+            throw console.log(error)
+        }
+    }
+    async getReceiverId(chatId: string, senderId: string): Promise<string | null> {
+        const chat = await this.prisma.chat.findUnique({
+            where: { id: chatId },
+            select: { user1: true, user2: true },
+        })
+
+        if (!chat) return null
+
+        return chat.user1.id === senderId ? chat.user2.id : chat.user1.id
     }
 }
 

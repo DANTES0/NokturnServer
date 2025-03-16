@@ -61,14 +61,20 @@ class LotController {
         try {
             const { lotId, bet, userId } = req.body
 
+            console.log('Получены данные для ставки:', { lotId, bet, userId })
+
             if (!userId || !lotId || !bet) {
+                console.error('Ошибка: Все поля обязательны')
                 res.status(400).json({ message: 'Все поля обязательны' })
+                return
             }
 
             const placeUpdateLot = await this.lotService.palceBet(userId, lotId, Number(bet))
 
+            console.log('Результат ставки:', placeUpdateLot)
             res.status(200).json(placeUpdateLot)
         } catch (error) {
+            console.error('Ошибка при размещении ставки:', error)
             res.status(500).json({ message: 'Ошибка при размещении ставки', error: (error as Error).message })
         }
     }

@@ -152,7 +152,7 @@ class LotService {
     //Сервис для ставок
     async palceBet(userId: string, lotId: string, bet: number) {
         const lot = await this.prisma.lot.findUnique({ where: { id: Number(lotId) } })
-
+        // console.log('Лот', lot)
         if (!lot) {
             throw new Error('Лот не найден')
         }
@@ -173,6 +173,7 @@ class LotService {
             where: { id: Number(lotId) },
             data: { current_bet: bet },
         })
+        console.log(updatedLot)
         io.emit('newBet', { lotId, bet, userId })
 
         return updatedLot

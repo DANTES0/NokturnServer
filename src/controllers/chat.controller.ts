@@ -12,6 +12,7 @@ class ChatController {
         try {
             const { userId } = req.params
             const chats = await this.chatService.getUserChats(userId)
+
             res.status(200).json(chats)
         } catch (error) {
             res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
