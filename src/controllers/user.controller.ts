@@ -98,6 +98,15 @@ class UserController {
             res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
         }
     }
+    async getUsersWithAtLeastThreeArts(req: Request, res: Response) {
+        try {
+            const limit = parseInt(req.query.limit as string) || 10
+            const users = await this.userService.findUsersWithAtLeastThreeArts(limit)
+            res.json(users)
+        } catch (error) {
+            res.status(500).json({ message: 'Ошибка при получении пользователей', error })
+        }
+    }
 }
 
 export default new UserController()

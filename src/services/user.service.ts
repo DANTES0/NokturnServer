@@ -70,6 +70,24 @@ class UserService {
             throw console.log(error)
         }
     }
+    async findUsersWithAtLeastThreeArts(limit: number): Promise<User[]> {
+        const users = await this.prisma.user.findMany({
+            where: {
+                arts: {
+                    some: {},
+                },
+            },
+            include: {
+                arts: {
+                    select: { id: true, image: true, name: true },
+                },
+            },
+            orderBy: {
+                id: 'asc',
+            },
+        })
+        return users.filter((user) => user.arts.length >= 3).slice(0, limit)
+    }
 }
 
 export default UserService
