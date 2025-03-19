@@ -62,6 +62,8 @@ class LotService {
             }
             if (files?.another_images) {
                 lotData.another_images = files.another_images.map((file) => `/uploads/${file.filename}`)
+            } else {
+                lotData.another_images = []
             }
 
             return await this.prisma.lot.update({
