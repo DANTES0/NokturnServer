@@ -37,6 +37,23 @@ class ArtController {
             res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
         }
     }
+    async deleteArt(req: Request, res: Response): Promise<void> {
+        try {
+            const artId = Number(req.params.artId)
+            if (isNaN(artId)) {
+                res.status(400).json({ message: 'Некорректный ID' })
+            }
+
+            const deletedArt = await this.artService.deleteArt(artId)
+            if (!deletedArt) {
+                res.status(404).json({ message: 'Арт не найден' })
+            }
+
+            res.json({ message: 'Арт успешно удален', deletedArt })
+        } catch (error) {
+            res.status(500).json({ message: `Ошибка при удалении арта: ${error}` })
+        }
+    }
 }
 
 export default new ArtController()

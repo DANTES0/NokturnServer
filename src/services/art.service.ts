@@ -25,6 +25,17 @@ class ArtService {
             throw new Error(`Не удалось создать арт: ${error}`)
         }
     }
+    async deleteArt(artId: number): Promise<Art | null> {
+        try {
+            return await this.prisma.art.delete({
+                where: {
+                    id: artId,
+                },
+            })
+        } catch (error) {
+            throw new Error(`Не удалось удалить арт: ${error}`)
+        }
+    }
 
     async getArtsById(userId: string): Promise<Art[] | null> {
         try {
