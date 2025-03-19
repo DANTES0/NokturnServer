@@ -135,6 +135,7 @@ class LotService {
                               }
                             : undefined,
                 },
+                orderBy: { begin_time_date: 'desc' },
             })
         } catch (error) {
             throw console.log(error)
