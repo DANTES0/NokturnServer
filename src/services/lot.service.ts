@@ -46,6 +46,49 @@ class LotService {
         }
     }
 
+    async updateLot(
+        id: number,
+        lotData: Partial<Omit<Lot, 'id' | 'updated_at' | 'user' | 'buyer_id' | 'current_bet' | 'reserve_price'>>,
+        files?: { image?: Express.Multer.File[]; another_images?: Express.Multer.File[] },
+    ): Promise<Lot> {
+        try {
+            const existingLot = await this.prisma.lot.findUnique({ where: { id } })
+            if (!existingLot) {
+                throw new Error('Лот не найден')
+            }
+
+            if (files?.image) {
+                lotData.image = `/uploads/${files.image[0].filename}`
+            }
+            if (files?.another_images) {
+                lotData.another_images = files.another_images.map((file) => `/uploads/${file.filename}`)
+            }
+
+            return await this.prisma.lot.update({
+                where: { id },
+                data: lotData,
+            })
+        } catch (error) {
+            console.error('Ошибка при обновлении лота', error)
+            throw new Error(`Не удалось обновить лот: ${error}`)
+        }
+    }
+
+    async deleteLot(id: number): Promise<{ message: string }> {
+        try {
+            const existingLot = await this.prisma.lot.findUnique({ where: { id } })
+            if (!existingLot) {
+                throw new Error('Лот не найден')
+            }
+
+            await this.prisma.lot.delete({ where: { id } })
+            return { message: 'Лот успешно удален' }
+        } catch (error) {
+            console.error('Ошибка при удалении лота', error)
+            throw new Error(`Не удалось удалить лот: ${error}`)
+        }
+    }
+
     async findAllPosts() {}
     async findNewPosts() {}
     async findLotById(id: number): Promise<Lot | null> {
