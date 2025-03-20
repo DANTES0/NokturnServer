@@ -52,9 +52,17 @@ class ArtService {
         }
     }
 
-    async getArtAll(): Promise<Art[] | null> {
+    async getArtAll(searchQuery?: string): Promise<Art[] | null> {
         try {
             return await this.prisma.art.findMany({
+                where: searchQuery
+                    ? {
+                          name: {
+                              contains: searchQuery,
+                              mode: 'insensitive',
+                          },
+                      }
+                    : undefined,
                 orderBy: { load_time: 'desc' },
                 include: {
                     user: {

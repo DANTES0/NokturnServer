@@ -7,7 +7,7 @@ const router = Router()
 router.post(
     '/',
     upload.fields([{ name: 'image', maxCount: 1 }, { name: 'another_images' }]),
-    addWatermark, // Добавляем middleware перед контроллером
+    addWatermark,
     lotController.createLot.bind(lotController),
 )
 router.post('/placeBet', lotController.placeUpdatedLotBet.bind(lotController))
@@ -17,7 +17,7 @@ router.get('/:id', lotController.getLotById.bind(lotController))
 router.put(
     '/:id',
     upload.fields([{ name: 'image', maxCount: 1 }, { name: 'another_images' }]),
-    addWatermark, // Добавляем обработку водяного знака и при обновлении
+    addWatermark,
     lotController.updateLot.bind(lotController),
 )
 router.delete('/:id', lotController.deleteLot.bind(lotController))

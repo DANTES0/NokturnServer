@@ -43,19 +43,30 @@ class UserService {
             throw console.log(error)
         }
     }
-    async findAllUsers(): Promise<User[] | null> {
+    async findAllUsers(searchQuery?: string): Promise<User[] | null> {
         try {
-            return await this.prisma.user.findMany({
+            const users = await this.prisma.user.findMany({
+                where: searchQuery
+                    ? {
+                          OR: [
+                              { firstname: { contains: searchQuery, mode: 'insensitive' } },
+                              { lastname: { contains: searchQuery, mode: 'insensitive' } },
+                          ],
+                      }
+                    : undefined,
                 include: {
-                    arts: {
-                        select: { id: true, image: true, name: true },
-                    },
+                    arts: { select: { id: true, image: true, name: true } },
                 },
             })
+
+            // Сортируем по количеству артов
+            return users.sort((a, b) => b.arts.length - a.arts.length)
         } catch (error) {
-            throw console.log(error)
+            console.log(error)
+            throw new Error('Ошибка при получении пользователей')
         }
     }
+
     async createUser(data: { firstname: string; mail: string; password: string; birthday_date: string }): Promise<User> {
         try {
             return await this.prisma.user.create({

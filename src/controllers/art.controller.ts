@@ -31,7 +31,8 @@ class ArtController {
 
     async getArtsAll(req: Request, res: Response): Promise<void> {
         try {
-            const arts = await this.artService.getArtAll()
+            const searchQuery = req.query.search as string | undefined
+            const arts = await this.artService.getArtAll(searchQuery)
             res.status(200).json(arts)
         } catch (error) {
             res.status(500).json({ message: 'Ошибка сервера', error: (error as Error).message })
