@@ -62,10 +62,17 @@ io.on('connection', (socket) => {
         socket.leave(`user_${userId}`)
     })
 
-    socket.on('sendMessage', async ({ chatId, senderId, text }) => {
+    socket.on('sendMessage', async ({ chatId, senderId, text, imageUrls, messageId }) => {
         console.log(`Новое сообщение в чате ${chatId} от ${senderId}: ${text}`)
 
-        const newMessage = await chatService.createMessage(chatId, senderId, text)
+        console.log('Айди сообщения', messageId)
+        let newMessage
+        if (messageId != null && text == null) {
+            newMessage = await chatService.getMessageById(messageId)
+        } else {
+            newMessage = await chatService.createMessage(chatId, senderId, text, imageUrls)
+        }
+
         io.to(`chat_${chatId}`).emit('newMessage', newMessage)
 
         const receiverId = await chatService.getReceiverId(chatId, senderId)
@@ -81,14 +88,11 @@ io.on('connection', (socket) => {
     socket.on('markAsRead', async ({ chatId, userId }) => {
         console.log(`✅ Пользователь ${userId} прочитал сообщения в чате ${chatId}`)
 
-        // Обновляем все непрочитанные сообщения как прочитанные
         const updatedMessages = await chatService.markMessagesAsRead(chatId, userId)
         console.log('ОАИШРПШАПШАП', updatedMessages)
 
-        // Сообщаем всем пользователям в чате, что сообщения теперь прочитаны
         io.to(`chat_${chatId}`).emit('messagesRead', { chatId, updatedMessages })
 
-        // Обновляем счетчик непрочитанных сообщений у получателя
         const unreadCount = await chatService.countUnreadMessages(chatId, userId)
         io.to(`chat_${chatId}`).emit('updateUnreadCount', { chatId, count: unreadCount })
     })

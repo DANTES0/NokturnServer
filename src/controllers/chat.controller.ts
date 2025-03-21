@@ -46,11 +46,18 @@ class ChatController {
     async createMessage(req: Request, res: Response): Promise<void> {
         try {
             const { chatId, senderId, text } = req.body
-            if (!chatId || !senderId || !text) {
+
+            if (!chatId || !senderId) {
                 res.status(400).json({ message: 'Нет данных' })
                 return
             }
-            const createMessage = await this.chatService.createMessage(chatId, senderId, text)
+
+            let imageUrls: string[] = []
+            if (req.files && Array.isArray(req.files)) {
+                imageUrls = req.files.map((file) => `/uploads/${file.filename}`)
+            }
+
+            const createMessage = await this.chatService.createMessage(chatId, senderId, text || null, imageUrls)
             res.status(200).json(createMessage)
         } catch (error) {
             res.status(500).json({ message: 'Ошибка при создании сообщения', error: (error as Error).message })

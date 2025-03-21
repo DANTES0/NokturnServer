@@ -83,10 +83,10 @@ class ChatService {
         }
     }
 
-    async createMessage(chatId: string, senderId: string, text: string): Promise<Message> {
+    async createMessage(chatId: string, senderId: string, text: string, imageUrls: string[]): Promise<Message> {
         try {
             return await this.prisma.message.create({
-                data: { chatId, senderId, text, isRead: false },
+                data: { chatId, senderId, text, imageUrls, isRead: false },
                 include: {
                     sender: {
                         select: {
@@ -147,6 +147,12 @@ class ChatService {
                 createdAt: true,
                 isRead: true,
             },
+        })
+    }
+
+    async getMessageById(id: string) {
+        return await this.prisma.message.findUnique({
+            where: { id },
         })
     }
 }

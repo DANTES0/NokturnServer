@@ -2,9 +2,10 @@ model Message {
   id        String   @id @default(uuid())
   chatId    String   
   senderId  String   
-  text      String   
+  text      String?   
   createdAt DateTime @default(now())
   isRead Boolean @default(false)
+  imageUrls String[] @default([])
 
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
