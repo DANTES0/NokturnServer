@@ -1,11 +1,14 @@
 import { io } from '@/server'
 import { PrismaClient, Lot, HistoryLotBet } from '@prisma/client'
+import ChatService from './chat.service'
 
 class LotService {
     private prisma: PrismaClient
+    private chatService: ChatService
 
     constructor() {
         this.prisma = new PrismaClient()
+        this.chatService = new ChatService()
     }
 
     async createLot(
@@ -181,6 +184,7 @@ class LotService {
                     select: { userId: true },
                 })
 
+                // Обновляем статус лота
                 await this.prisma.lot.update({
                     where: { id: lot.id },
                     data: {
@@ -189,6 +193,16 @@ class LotService {
                     },
                 })
                 console.log(`Лот ${lot.id} завершён. Покупатель: ${lastBet?.userId || 'нет ставок'}`)
+
+                if (lastBet && lastBet.userId) {
+                    const authorId = lot.userId
+                    const buyerId = lastBet.userId
+
+                    const chat = await this.chatService.createChat(buyerId, authorId)
+
+                    await this.chatService.createMessage(chat.id, authorId, `Поздравляю с покупкой лота ${lot.id}!`, [])
+                    console.log(`Чат создан между автором лота ${authorId} и покупателем ${buyerId}.`)
+                }
             }
         } catch (error) {
             console.error('Ошибка при обновлении статуса лотов', error)
