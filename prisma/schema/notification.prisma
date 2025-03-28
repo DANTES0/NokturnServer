@@ -1,0 +1,12 @@
+model Notification {
+  id          Int      @id @default(autoincrement())
+  userId      String   
+  type        String  
+  lotId       Int?     
+  senderId    String?  
+  createdAt   DateTime @default(now())
+  isRead      Boolean  @default(false)
+
+  user        User     @relation(fields: [userId], references: [id])
+  lot         Lot?     @relation(fields: [lotId], references: [id]) 
+}
