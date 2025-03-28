@@ -135,6 +135,18 @@ class ChatService {
         return chat.user1.id === senderId ? chat.user2.id : chat.user1.id
     }
 
+    async countAllUnreadMessages(userId: string) {
+        return await this.prisma.message.count({
+            where: {
+                chat: {
+                    OR: [{ user1Id: userId }, { user2Id: userId }],
+                },
+                senderId: { not: userId }, // Исключаем свои сообщения
+                isRead: false,
+            },
+        })
+    }
+
     async getMessages(chatId: string) {
         return await this.prisma.message.findMany({
             where: { chatId },

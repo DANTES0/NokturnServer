@@ -83,6 +83,15 @@ io.on('connection', (socket) => {
         const unreadCount = await chatService.countUnreadMessages(chatId, senderId)
         io.to(`chat_${chatId}`).emit('updateUnreadCount', { chatId, count: unreadCount })
         io.to(`user_${receiverId}`).emit('updateUnreadCount', { chatId, count: unreadCount })
+        const unreadCounts = await chatService.countAllUnreadMessages(receiverId)
+        io.to(`user_${receiverId}`).emit('updateTotalUnreadCount', unreadCounts)
+    })
+
+    socket.on('requestUnreadCount', async (userId) => {
+        console.log('ЗАШЛО в АНРИДКАУНТ')
+        const unreadCount = await chatService.countAllUnreadMessages(userId)
+        console.log('ЗАШЛО в АНРИДКАУНТ', unreadCount)
+        io.to(`user_${userId}`).emit('updateTotalUnreadCount', unreadCount)
     })
 
     socket.on('markAsRead', async ({ chatId, userId }) => {
@@ -95,6 +104,8 @@ io.on('connection', (socket) => {
 
         const unreadCount = await chatService.countUnreadMessages(chatId, userId)
         io.to(`chat_${chatId}`).emit('updateUnreadCount', { chatId, count: unreadCount })
+        const unreadCounts = await chatService.countAllUnreadMessages(userId)
+        io.to(`user_${userId}`).emit('updateTotalUnreadCount', unreadCounts)
     })
 
     socket.on('joinChat', (chatId) => {
