@@ -250,6 +250,26 @@ class LotService {
             throw console.log(error)
         }
     }
+
+    async getPreviousHighestBidder(lotId: number): Promise<{ userId: string; bet: number } | null> {
+        try {
+            const previousBet = await this.prisma.historyLotBet.findMany({
+                where: { lotId },
+                orderBy: { time_date: 'desc' },
+                take: 2,
+            })
+
+            if (previousBet.length < 2) return null
+
+            return {
+                userId: previousBet[1].userId,
+                bet: previousBet[1].bet,
+            }
+        } catch (error) {
+            console.error('Ошибка при получении предыдущего наибольшего бета:', error)
+            throw new Error('Не удалось получить предыдущего наибольшего бета')
+        }
+    }
 }
 
 export default LotService

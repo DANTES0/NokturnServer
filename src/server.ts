@@ -14,6 +14,7 @@ import chatRoutes from './routes/chat.routes'
 
 import LotService from './services/lot.service'
 import ChatService from './services/chat.service'
+import NotificationService from './services/notification.service'
 
 dotenv.config()
 
@@ -24,6 +25,7 @@ const io = new Server(server, { cors: { origin: '*' } })
 
 const lotService = new LotService()
 const chatService = new ChatService()
+const notificationService = new NotificationService()
 
 setInterval(async () => {
     await lotService.activateLots()
@@ -55,6 +57,19 @@ io.on('connection', (socket) => {
         const updatedHistory = await lotService.getHistoryLotBet(data.lotId)
         console.log('Отправляем обновлённую историю:', updatedHistory)
         io.emit('updateHistory', updatedHistory)
+
+        const previousBidder = await lotService.getPreviousHighestBidder(data.lotId)
+
+        if (previousBidder && previousBidder.userId !== data.userId) {
+            console.log(`Ставку перебили! Уведомляем пользователя ${previousBidder.userId}`)
+
+            const notification = await notificationService.createLotNotification(previousBidder.userId, data.lotId, data.userId)
+
+            io.to(`user_${previousBidder.userId}`).emit('newNotification', notification)
+
+            const unreadNotifications = await notificationService.getUserNotifications(data.userId)
+            io.to(`user_${data.userId}`).emit('allNotifications', unreadNotifications)
+        }
     })
 
     socket.on('leaveLot', (userId) => {
@@ -106,6 +121,32 @@ io.on('connection', (socket) => {
         io.to(`chat_${chatId}`).emit('updateUnreadCount', { chatId, count: unreadCount })
         const unreadCounts = await chatService.countAllUnreadMessages(userId)
         io.to(`user_${userId}`).emit('updateTotalUnreadCount', unreadCounts)
+    })
+
+    socket.on('requestAllNotifications', async (userId) => {
+        console.log(`🔄 Пользователь ${userId} запрашивает непрочитанные уведомления`)
+        const unreadNotifications = await notificationService.getUserNotifications(userId)
+        io.to(`user_${userId}`).emit('allNotifications', unreadNotifications)
+    })
+
+    socket.on('requestLotNotifications', async (userId) => {
+        console.log(`🔄 Запрашиваются уведомления о лоте для пользователя ${userId}`)
+        const lotNotifications = await notificationService.getLotNotifications(userId)
+        io.to(`user_${userId}`).emit('lotNotifications', lotNotifications)
+    })
+
+    socket.on('requestMessageNotifications', async (userId) => {
+        console.log(`🔄 Запрашиваются уведомления о сообщениях для пользователя ${userId}`)
+        const messageNotifications = await notificationService.getMessageNotifications(userId)
+        io.to(`user_${userId}`).emit('messageNotifications', messageNotifications)
+    })
+
+    socket.on('markNotificationsAsRead', async (userId) => {
+        console.log(`Помечаем все уведомления как прочитанные для пользователя ${userId}`)
+
+        await notificationService.markAllNotificationsAsRead(userId)
+
+        socket.emit('notificationsReadConfirmed', userId)
     })
 
     socket.on('joinChat', (chatId) => {

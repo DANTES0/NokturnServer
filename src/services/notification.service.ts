@@ -7,12 +7,13 @@ class NotificationService {
         this.prisma = new PrismaClient()
     }
 
-    async createLotNotificatio(userId: string, lotId: number) {
+    async createLotNotification(userId: string, lotId: number, senderId: string) {
         return await this.prisma.notification.create({
             data: {
                 userId,
                 type: 'new_bid',
                 lotId,
+                senderId,
             },
         })
     }
@@ -32,6 +33,21 @@ class NotificationService {
             where: {
                 userId,
             },
+            // include: {
+            //     lot: true,
+            //     user: true,
+            // },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
+    }
+    async getLotNotifications(userId: string) {
+        return await this.prisma.notification.findMany({
+            where: {
+                userId,
+                type: 'new_bid',
+            },
             include: {
                 lot: true,
                 user: true,
@@ -39,6 +55,35 @@ class NotificationService {
             orderBy: {
                 createdAt: 'desc',
             },
+        })
+    }
+
+    // Получение уведомлений о сообщениях
+    async getMessageNotifications(userId: string) {
+        return await this.prisma.notification.findMany({
+            where: {
+                userId,
+                type: 'new_message',
+            },
+            include: {
+                user: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
+    }
+
+    async markNotificationAsRead(notificationId: number) {
+        return await this.prisma.notification.update({
+            where: { id: notificationId },
+            data: { isRead: true },
+        })
+    }
+    async markAllNotificationsAsRead(userId: string) {
+        return await this.prisma.notification.updateMany({
+            where: { userId },
+            data: { isRead: true },
         })
     }
 }
